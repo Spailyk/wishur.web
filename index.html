@@ -1,0 +1,1526 @@
+<!DOCTYPE html>
+<html lang="ru" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wishur</title>
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Unbounded:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Montserrat', 'sans-serif'],
+            heading: ['Unbounded', 'sans-serif']
+          },
+          colors: {
+            brand: {
+              50: '#fff7ed',
+              100: '#ffedd5',
+              200: '#fed7aa',
+              300: '#fdba74',
+              400: '#fb923c',
+              500: '#FF6A00',
+              600: '#ea580c',
+              700: '#C94700',
+              800: '#9a3412',
+              900: '#7c2d12',
+              950: '#431407',
+              glow: '#FF6A00',
+              dark: '#0B0B0B',
+              surface: '#151515'
+            },
+            muted: '#A0A0A0'
+          }
+        }
+      }
+    }
+  </script>
+  <script>
+    if (localStorage.getItem('theme') === 'light') document.documentElement.classList.add('light');
+  </script>
+  <style>
+    :root {
+      --color-primary: #FF6A00;
+      --color-secondary: #C94700;
+      --color-bg: #0B0B0B;
+      --color-surface: #151515;
+      --color-text: #FFFFFF;
+      --color-muted: #A0A0A0;
+    }
+
+    html.theme-anim * {
+      transition: background-color 0.4s cubic-bezier(0.16,1,0.3,1),
+                  color 0.4s cubic-bezier(0.16,1,0.3,1),
+                  border-color 0.4s cubic-bezier(0.16,1,0.3,1),
+                  box-shadow 0.4s cubic-bezier(0.16,1,0.3,1) !important;
+    }
+
+    body {
+      background-color: #0B0B0B;
+      color: #FFFFFF;
+      font-family: 'Montserrat', sans-serif;
+      overflow-x: hidden;
+      margin: 0;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    ::-webkit-scrollbar {
+      width: 10px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0B0B0B;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #262626;
+      border-radius: 5px;
+      border: 2px solid #0B0B0B;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #FF6A00;
+    }
+
+    .font-heading { font-family: 'Unbounded', sans-serif; }
+
+    .glass-panel {
+      background: rgba(21, 21, 21, 0.75);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 106, 0, 0.2);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.7);
+    }
+
+    .glass-panel-hover {
+      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+                  border-color 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+                  box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .glass-panel-hover:hover {
+      transform: translateY(-5px);
+      border-color: rgba(255, 106, 0, 0.45);
+      box-shadow: 0 16px 45px -10px rgba(255, 106, 0, 0.32);
+    }
+
+    .glow-text {
+      text-shadow: 0 0 20px rgba(255, 106, 0, 0.65), 0 0 40px rgba(201, 71, 0, 0.35);
+    }
+    .glow-box {
+      box-shadow: 0 0 35px rgba(255, 106, 0, 0.22);
+    }
+
+    .bg-grid {
+      background-size: 48px 48px;
+      background-image: linear-gradient(to right, rgba(255, 106, 0, 0.05) 1px, transparent 1px),
+                        linear-gradient(to bottom, rgba(255, 106, 0, 0.05) 1px, transparent 1px);
+    }
+
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+    }
+    @keyframes liquid1 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(70px, 40px) scale(1.12); }
+      66% { transform: translate(-40px, 70px) scale(0.92); }
+    }
+    @keyframes liquid2 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(-60px, -50px) scale(1.08); }
+      66% { transform: translate(50px, -70px) scale(0.96); }
+    }
+    .orb-1 { animation: liquid1 28s ease-in-out infinite; }
+    .orb-2 { animation: liquid2 36s ease-in-out infinite; }
+
+    .page-view {
+      display: none;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1), transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .page-view.active {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .nav-pill {
+      position: absolute;
+      height: calc(100% - 8px);
+      top: 4px;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      border-radius: 12px;
+      background: rgba(255, 106, 0, 0.22);
+      border: 1px solid rgba(255, 106, 0, 0.45);
+    }
+
+    .toast {
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    a, button {
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    main { flex: 1 0 auto; }
+    footer { flex-shrink: 0; }
+
+    html.light .icon-sun { display: none; }
+    html:not(.light) .icon-moon { display: none; }
+
+    .light body { background-color: #fbfbfb; color: #151515; }
+    .light .bg-grid {
+      background-image: linear-gradient(to right, rgba(255, 106, 0, 0.08) 1px, transparent 1px),
+                        linear-gradient(to bottom, rgba(255, 106, 0, 0.08) 1px, transparent 1px);
+    }
+    .light .orb { opacity: 0.28; }
+    .light .glass-panel {
+      background: rgba(255, 255, 255, 0.85);
+      border-color: rgba(255, 106, 0, 0.25);
+      box-shadow: 0 8px 32px 0 rgba(255, 106, 0, 0.1);
+    }
+    .light header {
+      background-color: rgba(255, 255, 255, 0.9);
+      border-color: rgba(255, 106, 0, 0.2);
+    }
+    .light footer {
+      background-color: rgba(255, 255, 255, 0.92);
+      border-color: rgba(255, 106, 0, 0.15);
+    }
+    .light .text-white { color: #151515 !important; }
+    .light .text-muted, .light .text-gray-300, .light .text-gray-400 { color: #555555 !important; }
+    .light .bg-brand-surface { background-color: #f0f0f0 !important; }
+    .light #cursorGlow {
+      background: radial-gradient(circle, rgba(255, 106, 0, 0.15) 0%, rgba(255, 106, 0, 0) 70%);
+    }
+
+    #particles { transition: opacity 0.5s cubic-bezier(0.16,1,0.3,1); }
+    #cursorGlow {
+      position: fixed; width: 320px; height: 320px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,106,0,0.18) 0%, rgba(255,106,0,0) 70%);
+      pointer-events: none; z-index: 9999; transform: translate(-50%, -50%);
+      transition: opacity 0.4s cubic-bezier(0.16,1,0.3,1);
+      opacity: 0; mix-blend-mode: screen;
+    }
+
+    /* FAQ: плавное выплывание вниз при открытии и вверх при закрытии */
+    .faq-content {
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(-8px);
+      transition: max-height 0.45s cubic-bezier(0.16,1,0.3,1),
+                  opacity 0.45s cubic-bezier(0.16,1,0.3,1),
+                  transform 0.45s cubic-bezier(0.16,1,0.3,1);
+    }
+    .faq-content.open {
+      max-height: 500px;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Copy button animation */
+    .copy-btn-icon {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+    }
+    .copy-btn-icon .icon-copy,
+    .copy-btn-icon .icon-check {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.3s cubic-bezier(0.16,1,0.3,1),
+                  transform 0.3s cubic-bezier(0.16,1,0.3,1);
+    }
+    .copy-btn-icon .icon-check {
+      opacity: 0;
+      transform: scale(0.5) rotate(-20deg);
+      color: #34d399;
+    }
+    .copy-btn-icon.copied .icon-copy {
+      opacity: 0;
+      transform: scale(0.5) rotate(20deg);
+    }
+    .copy-btn-icon.copied .icon-check {
+      opacity: 1;
+      transform: scale(1) rotate(0deg);
+    }
+
+    .icon-svg {
+      display: inline-block;
+      vertical-align: middle;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body class="bg-[#0B0B0B] text-white min-h-screen flex flex-col bg-grid relative selection:bg-[#FF6A00] selection:text-white">
+  <div id="cursorGlow"></div>
+
+  <!-- Ambient Glow Orbs -->
+  <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+    <div class="orb orb-1 w-[550px] h-[550px] bg-[#FF6A00]/15 top-[-100px] left-[-120px]"></div>
+    <div class="orb orb-2 w-[650px] h-[650px] bg-[#C94700]/15 bottom-[-140px] right-[-100px]"></div>
+  </div>
+
+  <canvas id="particles" class="fixed inset-0 pointer-events-none z-0"></canvas>
+
+  <!-- Header -->
+  <header class="sticky top-0 z-50 backdrop-blur-2xl bg-[#0B0B0B]/85 border-b border-[#FF6A00]/20 px-3 lg:px-6 py-3.5 transition-colors">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-3 flex-nowrap">
+
+      <!-- Logo -->
+      <a href="#" onclick="switchPage('home');return false;" class="flex items-center gap-3 group shrink-0">
+        <div class="w-10 h-10 rounded-xl bg-[#151515] border border-[#FF6A00]/40 flex items-center justify-center overflow-hidden p-1 group-hover:border-[#FF6A00] transition-all shadow-[0_0_15px_rgba(255,106,0,0.3)]">
+          <img src="assets/logo.png" alt="Wishur" class="w-full h-full object-contain">
+        </div>
+        <span class="font-heading font-extrabold text-xl lg:text-2xl tracking-wider text-white whitespace-nowrap">
+          WISHUR
+        </span>
+      </a>
+
+      <!-- Desktop Navigation (one row, no expansion) -->
+      <nav class="hidden md:flex items-center gap-1 bg-[#151515]/80 p-1 rounded-2xl border border-[#FF6A00]/25 relative flex-nowrap min-w-0 overflow-x-auto" id="desktopNav">
+        <div id="navPill" class="nav-pill pointer-events-none"></div>
+        <button onclick="switchPage('home')" data-nav="home" class="nav-btn relative z-10 px-3 py-2 rounded-xl text-[11px] font-semibold uppercase font-heading text-white transition-colors whitespace-nowrap">Главная</button>
+        <button onclick="switchPage('features')" data-nav="features" class="nav-btn relative z-10 px-3 py-2 rounded-xl text-[11px] font-semibold uppercase font-heading text-[#A0A0A0] hover:text-white transition-colors whitespace-nowrap">Преимущества</button>
+        <button onclick="switchPage('rules')" data-nav="rules" class="nav-btn relative z-10 px-3 py-2 rounded-xl text-[11px] font-semibold uppercase font-heading text-[#A0A0A0] hover:text-white transition-colors whitespace-nowrap">Правила</button>
+        <button onclick="switchPage('team')" data-nav="team" class="nav-btn relative z-10 px-3 py-2 rounded-xl text-[11px] font-semibold uppercase font-heading text-[#A0A0A0] hover:text-white transition-colors whitespace-nowrap">Команда</button>
+        <button onclick="switchPage('faq')" data-nav="faq" class="nav-btn relative z-10 px-3 py-2 rounded-xl text-[11px] font-semibold uppercase font-heading text-[#A0A0A0] hover:text-white transition-colors whitespace-nowrap">FAQ</button>
+        <button onclick="switchPage('socials')" data-nav="socials" class="nav-btn relative z-10 px-3 py-2 rounded-xl text-[11px] font-semibold uppercase font-heading text-[#A0A0A0] hover:text-white transition-colors whitespace-nowrap">Соц. сети</button>
+      </nav>
+
+      <!-- Right Actions -->
+      <div class="flex items-center gap-1.5 shrink-0">
+        <button id="themeToggle" onclick="toggleTheme()" aria-label="Сменить тему" class="w-9 h-9 flex items-center justify-center rounded-xl bg-[#151515] border border-[#FF6A00]/25 text-[#FF6A00] hover:text-white hover:border-[#FF6A00] hover:bg-[#C94700]/30">
+          <i data-lucide="sun" class="w-[18px] h-[18px] icon-sun"></i>
+          <i data-lucide="moon" class="w-[18px] h-[18px] icon-moon"></i>
+        </button>
+        <button id="particleToggle" onclick="toggleParticles()" aria-label="Эффекты частиц" class="w-9 h-9 flex items-center justify-center rounded-xl bg-[#151515] border border-[#FF6A00]/25 text-[#FF6A00] hover:text-white hover:border-[#FF6A00] hover:bg-[#C94700]/30">
+          <i data-lucide="sparkles" class="w-[18px] h-[18px]"></i>
+        </button>
+
+        <!-- Mobile Menu Button -->
+        <button id="mobileMenuBtn" aria-label="Открыть меню" class="md:hidden p-2 rounded-xl bg-[#151515] border border-[#FF6A00]/30 text-white">
+          <i data-lucide="menu" class="w-6 h-6"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Drawer Menu -->
+    <div id="mobileMenu" class="hidden md:hidden px-4 pt-4 pb-6 border-t border-[#FF6A00]/15 bg-[#0B0B0B]/95 backdrop-blur-2xl mt-3">
+      <nav class="flex flex-col gap-2">
+        <button onclick="switchPage('home');toggleMobileMenu()" class="text-left px-4 py-3 rounded-xl text-sm font-semibold font-heading uppercase text-gray-200 hover:bg-[#FF6A00]/15">Главная</button>
+        <button onclick="switchPage('features');toggleMobileMenu()" class="text-left px-4 py-3 rounded-xl text-sm font-semibold font-heading uppercase text-gray-200 hover:bg-[#FF6A00]/15">Преимущества</button>
+        <button onclick="switchPage('rules');toggleMobileMenu()" class="text-left px-4 py-3 rounded-xl text-sm font-semibold font-heading uppercase text-gray-200 hover:bg-[#FF6A00]/15">Правила</button>
+        <button onclick="switchPage('team');toggleMobileMenu()" class="text-left px-4 py-3 rounded-xl text-sm font-semibold font-heading uppercase text-gray-200 hover:bg-[#FF6A00]/15">Команда проекта</button>
+        <button onclick="switchPage('faq');toggleMobileMenu()" class="text-left px-4 py-3 rounded-xl text-sm font-semibold font-heading uppercase text-gray-200 hover:bg-[#FF6A00]/15">FAQ</button>
+        <button onclick="switchPage('socials');toggleMobileMenu()" class="text-left px-4 py-3 rounded-xl text-sm font-semibold font-heading uppercase text-gray-200 hover:bg-[#FF6A00]/15">Соц. сети</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="relative z-10 max-w-7xl mx-auto px-4 lg:px-8 py-10 w-full">
+    <!-- ==================== СТРАНИЦА: ГЛАВНАЯ ==================== -->
+    <section id="page-home" class="page-view active">
+      <div class="text-center pt-6 md:pt-12 pb-8 max-w-4xl mx-auto">
+        <!-- Version Badge -->
+        <div class="inline-flex items-center gap-2.5 px-4 py-2 rounded-full glass-panel border-[#FF6A00]/40 text-[#FF6A00] text-xs md:text-sm font-semibold mb-6">
+          <span class="w-2.5 h-2.5 rounded-full bg-[#FF6A00] animate-ping"></span>
+          Версия сервера: <strong class="text-white tracking-wider">26.2-26.4</strong>
+        </div>
+
+        <h1 class="font-heading font-black text-4xl sm:text-6xl lg:text-7xl tracking-tight text-white mb-6 leading-tight">
+          АУТЕНТИЧНОЕ <br>
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#FF6A00] via-[#fb923c] to-[#C94700] glow-text">ВАНИЛЬНОЕ</span> ВЫЖИВАНИЕ
+        </h1>
+
+        <p class="max-w-2xl mx-auto text-[#A0A0A0] text-base sm:text-lg mb-10 leading-relaxed font-normal">
+          Wishur — приватный ванильный майнкрафт-сервер с отбором игроков по заявкам. Чистый геймплей без навязчивых модификаций, сохранение классического баланса и ламповое сообщество.
+        </p>
+
+        <!-- IP & Actions -->
+        <div class="flex flex-col sm:flex-row items-stretch justify-center gap-3 max-w-2xl mx-auto">
+
+          <!-- Simplified IP Copy Box -->
+          <div class="w-full sm:w-auto h-14 flex items-center justify-between gap-3 px-4 rounded-2xl glass-panel border-[#FF6A00]/30 glow-box">
+            <p class="font-heading font-bold text-[#FF6A00] text-base select-all whitespace-nowrap">mc.wishur.cc</p>
+            <button onclick="copyIP(this)" id="copyBtn" class="w-9 h-9 flex items-center justify-center rounded-lg bg-[#FF6A00]/20 hover:bg-[#FF6A00]/40 border border-[#FF6A00]/40 text-white transition-all active:scale-75 flex-shrink-0" aria-label="Скопировать IP">
+              <span class="copy-btn-icon">
+                <span class="icon-copy">
+                  <i data-lucide="copy" class="w-4 h-4 text-[#FF6A00]"></i>
+                </span>
+                <span class="icon-check">
+                  <i data-lucide="check" class="w-4 h-4"></i>
+                </span>
+              </span>
+            </button>
+          </div>
+
+          <!-- Apply / Discord Button -->
+          <a href="https://discord.com/invite/4WKTuSXs6c" target="_blank" rel="noopener" class="w-full sm:w-auto h-14 px-6 rounded-2xl bg-gradient-to-r from-[#FF6A00] to-[#C94700] hover:from-[#ff7c1a] hover:to-[#db4e00] text-white font-heading text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2.5 shadow-[0_0_25px_rgba(255,106,0,0.4)] hover:scale-[1.02] whitespace-nowrap flex-shrink-0">
+            <i data-lucide="file-check" class="w-5 h-5"></i>Подать заявку
+          </a>
+
+          <!-- Advantages shortcut -->
+          <button onclick="switchPage('features')" class="w-full sm:w-auto h-14 px-6 rounded-2xl glass-panel glass-panel-hover font-heading text-xs font-bold uppercase tracking-wider text-white border-[#FF6A00]/30 flex items-center justify-center gap-2.5 whitespace-nowrap flex-shrink-0">
+            <i data-lucide="compass" class="w-5 h-5 text-[#FF6A00]"></i>Преимущества
+          </button>
+        </div>
+
+        <!-- Live Server Status Card with Refresh -->
+        <div class="mt-8 max-w-lg mx-auto p-4 rounded-2xl glass-panel border-[#FF6A00]/25 flex items-center justify-between text-left reveal">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-[#151515] border border-[#FF6A00]/30 flex items-center justify-center text-[#FF6A00]">
+              <i data-lucide="server" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <p class="text-xs text-[#A0A0A0] font-heading uppercase">Текущий статус</p>
+              <p id="liveStatusDetail" class="text-sm font-heading font-semibold text-white">Проверка сервера...</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="text-right">
+              <p class="text-xs text-[#A0A0A0] font-heading uppercase">Игроков в сети</p>
+              <p id="livePlayerDetail" class="text-sm font-heading font-bold text-[#FF6A00]">—</p>
+            </div>
+            <button id="refreshStatusBtn" onclick="refreshServerStatus(this)" class="w-9 h-9 flex items-center justify-center rounded-xl bg-[#151515] border border-[#FF6A00]/30 text-[#FF6A00] hover:text-white hover:border-[#FF6A00] hover:bg-[#C94700]/30 flex-shrink-0" aria-label="Обновить статус сервера">
+              <i data-lucide="refresh-cw" class="w-4 h-4" id="refreshStatusIcon"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider max-w-4xl mx-auto h-px bg-gradient-to-r from-transparent via-[#FF6A00]/30 to-transparent my-12"></div>
+
+      <!-- Quick Intro Section -->
+      <div class="max-w-3xl mx-auto text-center space-y-4 reveal">
+        <p class="text-[#A0A0A0] text-sm sm:text-base leading-relaxed font-normal">
+          Добро пожаловать на <strong class="text-white">Wishur</strong> — сервер, созданный для ценителей подлинного ванильного геймплея. Здесь нет доната, дающего преимущество, а доступ выдается только после рассмотрения заявки.
+        </p>
+        <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
+          <span class="px-3.5 py-1 rounded-xl bg-[#151515] border border-[#FF6A00]/25 text-xs text-gray-300 font-heading">Версия: 26.2-26.4</span>
+          <span class="px-3.5 py-1 rounded-xl bg-[#151515] border border-[#FF6A00]/25 text-xs text-gray-300 font-heading">Вход по заявкам</span>
+          <span class="px-3.5 py-1 rounded-xl bg-[#151515] border border-[#FF6A00]/25 text-xs text-gray-300 font-heading">Честная ванила</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== СТРАНИЦА: ПРЕИМУЩЕСТВА ==================== -->
+    <section id="page-features" class="page-view">
+      <div class="text-center mb-12">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-panel border-[#FF6A00]/30 text-[#FF6A00] text-xs font-semibold mb-3">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5 text-[#FF6A00]"></i>Особенности сервера
+        </div>
+        <h2 class="font-heading font-extrabold text-2xl sm:text-4xl text-white mb-3">ПРЕИМУЩЕСТВА</h2>
+        <p class="text-[#A0A0A0] text-sm sm:text-base max-w-xl mx-auto">Ключевые принципы и философия майнкрафт сервера Wishur</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-6xl mx-auto">
+        <!-- Преимущество 1 -->
+        <div class="glass-panel glass-panel-hover p-8 rounded-3xl relative overflow-hidden group reveal flex flex-col justify-between">
+          <div>
+            <div class="w-14 h-14 rounded-2xl bg-[#151515] border border-[#FF6A00]/30 flex items-center justify-center text-[#FF6A00] mb-6 group-hover:scale-110 transition-transform shadow-[0_0_20px_rgba(255,106,0,0.2)]">
+              <i data-lucide="shield-check" class="w-7 h-7"></i>
+            </div>
+            <h3 class="font-heading font-bold text-lg sm:text-xl text-white mb-4">Сохранение ванильной механики</h3>
+            <p class="text-[#A0A0A0] leading-relaxed text-sm font-normal">
+              На сервере не применяются плагины, которые кардинально меняют базовые игровые процессы (например, систему прокачки, уникальные предметы или донатные механики). Используются только те плагины, которые затрагивают незначительные элементы — вход в игру, защиту аккаунта, античит или функционал чата с косметикой. Это позволяет сохранить аутентичный опыт, близкий к одиночной игры.
+            </p>
+          </div>
+          <div class="mt-6 pt-4 border-t border-[#FF6A00]/15 flex items-center gap-2 text-xs font-heading text-[#FF6A00]">
+            <i data-lucide="check" class="w-4 h-4"></i>Честный баланс
+          </div>
+        </div>
+
+        <!-- Преимущество 2 -->
+        <div class="glass-panel glass-panel-hover p-8 rounded-3xl relative overflow-hidden group reveal flex flex-col justify-between">
+          <div>
+            <div class="w-14 h-14 rounded-2xl bg-[#151515] border border-[#FF6A00]/30 flex items-center justify-center text-[#FF6A00] mb-6 group-hover:scale-110 transition-transform shadow-[0_0_20px_rgba(255,106,0,0.2)]">
+              <i data-lucide="user-check" class="w-7 h-7"></i>
+            </div>
+            <h3 class="font-heading font-bold text-lg sm:text-xl text-white mb-4">Отбор игроков через заявку</h3>
+            <p class="text-[#A0A0A0] leading-relaxed text-sm font-normal">
+              Доступ на сервер предоставляется после подачи заявки. Администрация проводит первичную проверку кандидатов, что позволяет отсеивать неадекватных или недобросовестных игроков. Такой подход способствует формированию стабильного и дружелюбного сообщества.
+            </p>
+          </div>
+          <div class="mt-6 pt-4 border-t border-[#FF6A00]/15 flex items-center gap-2 text-xs font-heading text-[#FF6A00]">
+            <i data-lucide="check" class="w-4 h-4"></i>Адекватное сообщество
+          </div>
+        </div>
+
+        <!-- Преимущество 3 -->
+        <div class="glass-panel glass-panel-hover p-8 rounded-3xl relative overflow-hidden group reveal flex flex-col justify-between">
+          <div>
+            <div class="w-14 h-14 rounded-2xl bg-[#151515] border border-[#FF6A00]/30 flex items-center justify-center text-[#FF6A00] mb-6 group-hover:scale-110 transition-transform shadow-[0_0_20px_rgba(255,106,0,0.2)]">
+              <i data-lucide="crown" class="w-7 h-7"></i>
+            </div>
+            <h3 class="font-heading font-bold text-lg sm:text-xl text-white mb-4">Разнообразие косметических опций</h3>
+            <p class="text-[#A0A0A0] leading-relaxed text-sm font-normal">
+              Игроки могут получать уникальные головные уборы — как бесплатно в рамках игровых событий, так и через покупку на официальном сайте. Это делает внутриигровые привилегии доступными не только для спонсоров, но и для активных участников сообщества.
+            </p>
+          </div>
+          <div class="mt-6 pt-4 border-t border-[#FF6A00]/15 flex items-center gap-2 text-xs font-heading text-[#FF6A00]">
+            <i data-lucide="check" class="w-4 h-4"></i>Уникальная косметика
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== СТРАНИЦА: ПРАВИЛА ==================== -->
+    <section id="page-rules" class="page-view">
+      <div class="text-center mb-12">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-panel border-[#FF6A00]/30 text-[#FF6A00] text-xs font-medium mb-3">
+          <svg class="w-4 h-4 text-[#FF6A00]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+          Официальный регламент Wishur
+        </div>
+        <h2 class="font-heading font-extrabold text-2xl sm:text-4xl text-white mb-3">ПРАВИЛА СЕРВЕРА</h2>
+        <p class="text-[#A0A0A0] text-sm sm:text-base max-w-xl mx-auto">Соблюдение данных правил обязательно для всех игроков проекта Wishur.</p>
+      </div>
+
+      <div class="max-w-4xl mx-auto space-y-6">
+
+        <!-- 1. АККАУНТЫ -->
+        <div class="glass-panel glass-panel-hover p-6 sm:p-8 rounded-3xl relative overflow-hidden reveal">
+          <div class="flex items-center gap-4 mb-6">
+            <div class="w-12 h-12 rounded-2xl bg-[#151515] border border-[#FF6A00]/30 flex items-center justify-center text-[#FF6A00] flex-shrink-0">
+              <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+            </div>
+            <div>
+              <span class="text-xs font-heading font-semibold uppercase text-[#FF6A00] tracking-wider">Раздел 1</span>
+              <h3 class="font-heading font-bold text-lg sm:text-xl text-white">АККАУНТЫ</h3>
+            </div>
+          </div>
+
+          <div class="space-y-4 text-sm text-gray-200 leading-relaxed font-normal">
+            <!-- 1.1 -->
+            <div class="p-4 rounded-2xl bg-[#0B0B0B]/60 border border-white/5 space-y-2">
+              <div class="flex items-start gap-3">
+                <span class="px-2 py-0.5 rounded-lg bg-[#151515] border border-[#FF6A00]/30 font-heading font-bold text-xs text-[#FF6A00] flex-shrink-0 mt-0.5">1.1</span>
+                <p>Запрещён взлом, вход, передача аккаунта.</p>
+              </div>
+              <div class="flex items-center gap-2 pl-9 text-xs text-rose-400 font-medium">
+                <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+                </svg>
+                <span><strong>Наказание:</strong> Бан навсегда</span>
+              </div>
+            </div>
+
+            <!-- 1.2 -->
+            <div class="p-4 rounded-2xl bg-[#0B0B0B]/60 border border-white/5 space-y-2">
+              <div class="flex items-start gap-3">
+                <span class="px-2 py-0.5 rounded-lg bg-[#151515] border border-[#FF6A00]/30 font-heading font-bold text-xs text-[#FF6A00] flex-shrink-0 mt-0.5">1.2</span>
+                <p>Запрещён второй аккаунт/обход правил, используя второй аккаунт. (Мультиаккаунт)</p>
+              </div>
+              <div class="flex items-center gap-2 pl-9 text-xs text-rose-400 font-medium">
+                <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+                </svg>
+                <span><strong>Наказание:</strong> Бан навсегда</span>
+              </div>
+            </div>
+
+            <!-- 1.3 -->
+            <div class="p-4 rounded-2xl bg-[#0B0B0B]/60 border border-white/5 space-y-2">
+              <div class="flex items-start gap-3">
+                <span class="px-2 py-0.5 rounded-lg bg-[#151515] border border-[#FF6A00]/30 font-heading font-bold text-xs text-[#FF6A00] flex-shrink-0 mt-0.5">1.3</span>
+                <p>Запрещёно скрытие багов, дюпов или игроков, нарушающие правила.</p>
+              </div>
+              <div class="flex items-center gap-2 pl-9 text-xs text-rose-400 font-medium">
+                <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+                </svg>
+                <span><strong>Наказание:</strong> Бан навсегда</span>
+              </div>
+            </div>
+
+            <!-- 1.4 -->
+            <div class="p-4 rounded-2xl bg-[#0B0B0B]/60 border border-white/5 space-y-2">
+              <div class="flex items-start gap-3">
+                <span class="px-2 py-0.5 rounded-lg bg-[#151515] border border-[#FF6A00]/30 font-heading font-bold text-xs text-[#FF6A00] flex-shrink-0 mt-0.5">1.4</span>
+                <p>Запрещены скины, ники, содержащие политики или запрещённые темы на твиче.</p>
+              </div>
+              <div class="flex items-center gap-2 pl-9 text-xs text-rose-400 font-medium">
+                <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+                </svg>
+                <span><strong>Наказание:</strong> Смена скина/ника; при повторном нарушении бан 7 дней</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. ПОВЕДЕНИЕ НА СЕРВЕРЕ -->
+        <div class="glass-panel glass-panel-hover p-6 sm:p-8 rounded-3xl relative overflow-hidden reveal">
+          <div class="flex items-center gap-4 mb-6">
+            <div class="w-12 h-12 rounded-2xl bg-[#151515] border border-[#FF6A00]/30 flex items-center justify-center text-[#FF6A00] flex-shrink-0">
+              <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+            </div>
+            <div>
+              <span class="text-xs font-heading font-semibold uppercase text-[#FF6A00] tracking-wider">Раздел 2</span>
+              <h3 class="font-heading font-bold text-lg sm:text-xl text-white">ПОВЕДЕНИЕ НА СЕРВЕРЕ</h3>
+            </div>
+          </div>
+
+          <div class="space-y-4 text-sm text-gray-200 leading-relaxed font-normal">
+            <!-- 2.1 -->
+            <div class="p-4 rounded-2xl bg-[#0B0B0B]/60 border border-white/5 space-y-2">
+              <div class="flex items-start gap-3">
+                <span class="px-2 py-0.5 rounded-lg bg-[#151515] border border-[#FF6A00]/30 font-heading font-bold text-xs text-[#FF6A00] flex-shrink-0 mt-0.5">2.1</span>
+                <p>Запрещено мешать игрокам.</p>
+              </div>
+              <div class="flex items-center gap-2 pl-9 text-xs text-rose-400 font-medium">
+                <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+                </svg>
+                <span><strong>Наказание:</strong> По вердикту судьи</span>
+              </div>
+            </div>
+
+            <!-- 2.2 -->
+            <div class="p-4 rounded-2xl bg-[#0B0B0B]/60 border border-white/5 space-y-2">
+              <div class="flex items-start gap-3">
+                <span class="px-2 py-0.5 rounded-lg bg-[#151515] border border-[#FF6A00]/30 font-heading font-bold text-xs text-[#FF6A00] flex-shrink-0 mt-0.5">2.2</span>
+                <p>Запрещено использовать чужие фермы для своей выгоды.</p>
+              </div>
+              <div class="flex items-center gap-2 pl-9 text-xs text-rose-400 font-medium">
+                <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+                </svg>
+                <span><strong>Наказание:</strong> Штраф</span>
+              </div>
+            </div>
+
+            <!-- 2.3 -->
+            <div class="p-4 rounded-2xl bg-[#0B0B0B]/60 border border-white/5 space-y-2">
+              <div class="flex items-start gap-3">
+                <span class="px-2 py-0.5 rounded-lg bg-[#151515] border border-[#FF6A00]/30 font-heading font-bold text-xs text-[#FF6A00] flex-shrink-0 mt-0.5">2.3</span>
+                <p>Запрещено причинять вред в ответ (самосуд).</p>
+              </div>
+              <div class="flex items-center gap-2 pl-9 text-xs text-rose-400 font-medium">
+                <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+                </svg>
+                <span><strong>Наказание:</strong> По вердикту судьи</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. ОБЩЕНИЕ/ЧАТ -->
+        <div class="glass-panel glass-panel-hover p-6 sm:p-8 rounded-3xl relative overflow-hidden reveal">
+          <div class="flex items-center gap-4 mb-6">
+            <div class="w-12 h-12 rounded-2xl bg-[#151515] border border-[#FF6A00]/30 flex items-center justify-center text-[#FF6A00] flex-shrink-0">
+              <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              </svg>
+            </div>
+            <div>
+              <span class="text-xs font-heading font-semibold uppercase text-[#FF6A00] tracking-wider">Раздел 3</span>
+              <h3 class="font-heading font-bold text-lg sm:text-xl text-white">ОБЩЕНИЕ / ЧАТ</h3>
+            </div>
+          </div>
+
+          <div class="space-y-4 text-sm text-gray-200 leading-relaxed font-normal">
+            <!-- 3.1 -->
+            <div class="p-4 rounded-2xl bg-[#0B0B0B]/60 border border-white/5 space-y-2">
+              <div class="flex items-start gap-3">
+                <span class="px-2 py-0.5 rounded-lg bg-[#151515] border border-[#FF6A00]/30 font-heading font-bold text-xs text-[#FF6A00] flex-shrink-0 mt-0.5">3.1</span>
+                <p>Запрещен любой вид флуда, спама.</p>
+              </div>
+              <div class="flex items-center gap-2 pl-9 text-xs text-rose-400 font-medium">
+                <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+                </svg>
+                <span><strong>Наказание:</strong> Мут</span>
+              </div>
+            </div>
+
+            <!-- 3.2 -->
+            <div class="p-4 rounded-2xl bg-[#0B0B0B]/60 border border-white/5 space-y-2">
+              <div class="flex items-start gap-3">
+                <span class="px-2 py-0.5 rounded-lg bg-[#151515] border border-[#FF6A00]/30 font-heading font-bold text-xs text-[#FF6A00] flex-shrink-0 mt-0.5">3.2</span>
+                <p>Запрещено писать любые банворды на твиче.</p>
+              </div>
+              <div class="flex items-center gap-2 pl-9 text-xs text-rose-400 font-medium">
+                <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+                </svg>
+                <span><strong>Наказание:</strong> Мут; При повторном нарушении бан.</span>
+              </div>
+            </div>
+
+            <!-- 3.3 -->
+            <div class="p-4 rounded-2xl bg-[#0B0B0B]/60 border border-white/5 space-y-2">
+              <div class="flex items-start gap-3">
+                <span class="px-2 py-0.5 rounded-lg bg-[#151515] border border-[#FF6A00]/30 font-heading font-bold text-xs text-[#FF6A00] flex-shrink-0 mt-0.5">3.3</span>
+                <p>Запрещено обсуждать полику в глобальном чате, или в локальном если рядом присутствует человек с прямой трансляцией на твич.</p>
+              </div>
+              <div class="flex items-center gap-2 pl-9 text-xs text-rose-400 font-medium">
+                <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+                </svg>
+                <span><strong>Наказание:</strong> Мут</span>
+              </div>
+            </div>
+
+            <!-- 3.4 -->
+            <div class="p-4 rounded-2xl bg-[#0B0B0B]/60 border border-white/5 space-y-2">
+              <div class="flex items-start gap-3">
+                <span class="px-2 py-0.5 rounded-lg bg-[#151515] border border-[#FF6A00]/30 font-heading font-bold text-xs text-[#FF6A00] flex-shrink-0 mt-0.5">3.4</span>
+                <p>Запрещены угрозы, провокации.</p>
+              </div>
+              <div class="flex items-center gap-2 pl-9 text-xs text-rose-400 font-medium">
+                <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+                </svg>
+                <span><strong>Наказание:</strong> Мут</span>
+              </div>
+            </div>
+
+            <!-- 3.5 -->
+            <div class="p-4 rounded-2xl bg-[#0B0B0B]/60 border border-white/5 space-y-2">
+              <div class="flex items-start gap-3">
+                <span class="px-2 py-0.5 rounded-lg bg-[#151515] border border-[#FF6A00]/30 font-heading font-bold text-xs text-[#FF6A00] flex-shrink-0 mt-0.5">3.5</span>
+                <p>Запрещено выражение нацистики или другой политической символики.</p>
+              </div>
+              <div class="flex items-center gap-2 pl-9 text-xs text-rose-400 font-medium">
+                <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+                </svg>
+                <span><strong>Наказание:</strong> Мут</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. ПВП/УБИЙСТВО -->
+        <div class="glass-panel glass-panel-hover p-6 sm:p-8 rounded-3xl relative overflow-hidden reveal">
+          <div class="flex items-center gap-4 mb-6">
+            <div class="w-12 h-12 rounded-2xl bg-[#151515] border border-[#FF6A00]/30 flex items-center justify-center text-[#FF6A00] flex-shrink-0">
+              <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"/>
+                <line x1="13" y1="19" x2="19" y2="13"/>
+                <line x1="16" y1="16" x2="20" y2="20"/>
+                <line x1="19" y1="21" x2="21" y2="19"/>
+              </svg>
+            </div>
+            <div>
+              <span class="text-xs font-heading font-semibold uppercase text-[#FF6A00] tracking-wider">Раздел 4</span>
+              <h3 class="font-heading font-bold text-lg sm:text-xl text-white">ПВП / УБИЙСТВО</h3>
+            </div>
+          </div>
+
+          <div class="space-y-4 text-sm text-gray-200 leading-relaxed font-normal">
+            <div class="p-4 rounded-2xl bg-[#0B0B0B]/60 border border-white/5 space-y-2">
+              <div class="flex items-start gap-3">
+                <span class="px-2 py-0.5 rounded-lg bg-[#151515] border border-[#FF6A00]/30 font-heading font-bold text-xs text-[#FF6A00] flex-shrink-0 mt-0.5">4.1</span>
+                <p>Запрещено нанесение урона игроку или его убийство.</p>
+              </div>
+              <div class="flex items-center gap-2 pl-9 text-xs text-rose-400 font-medium">
+                <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+                </svg>
+                <span><strong>Наказание:</strong> Возвращение вещей на место смерти (положить в сундук или в другой хранилище); Штраф</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. ГРИФЕРСТВО -->
+        <div class="glass-panel glass-panel-hover p-6 sm:p-8 rounded-3xl relative overflow-hidden reveal">
+          <div class="flex items-center gap-4 mb-6">
+            <div class="w-12 h-12 rounded-2xl bg-[#151515] border border-[#FF6A00]/30 flex items-center justify-center text-[#FF6A00] flex-shrink-0">
+              <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                <line x1="12" y1="9" x2="12" y2="13"/>
+                <line x1="12" y1="17" x2="12.01" y2="17"/>
+              </svg>
+            </div>
+            <div>
+              <span class="text-xs font-heading font-semibold uppercase text-[#FF6A00] tracking-wider">Раздел 5</span>
+              <h3 class="font-heading font-bold text-lg sm:text-xl text-white">ГРИФЕРСТВО</h3>
+            </div>
+          </div>
+
+          <div class="space-y-4 text-sm text-gray-200 leading-relaxed font-normal">
+            <!-- 5.1 -->
+            <div class="p-4 rounded-2xl bg-[#0B0B0B]/60 border border-white/5 space-y-2">
+              <div class="flex items-start gap-3">
+                <span class="px-2 py-0.5 rounded-lg bg-[#151515] border border-[#FF6A00]/30 font-heading font-bold text-xs text-[#FF6A00] flex-shrink-0 mt-0.5">5.1</span>
+                <p>Запрещено поломка, взрыв, поджог построек/вещей игрока</p>
+              </div>
+              <div class="flex items-center gap-2 pl-9 text-xs text-rose-400 font-medium">
+                <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+                </svg>
+                <span><strong>Наказание:</strong> Штраф; При повторном нарушении по вердикту судьи</span>
+              </div>
+            </div>
+
+            <!-- 5.2 -->
+            <div class="p-4 rounded-2xl bg-[#0B0B0B]/60 border border-white/5 space-y-2">
+              <div class="flex items-start gap-3">
+                <span class="px-2 py-0.5 rounded-lg bg-[#151515] border border-[#FF6A00]/30 font-heading font-bold text-xs text-[#FF6A00] flex-shrink-0 mt-0.5">5.2</span>
+                <div>
+                  <p>Запрещена кража:</p>
+                  <p class="text-gray-400 text-xs mt-0.5">Вещей, животных, мобов и тд.</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 pl-9 text-xs text-rose-400 font-medium">
+                <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+                </svg>
+                <span><strong>Наказание:</strong> Штраф; При повторном нарушении по вердикту судьи</span>
+              </div>
+            </div>
+
+            <!-- 5.3 -->
+            <div class="p-4 rounded-2xl bg-[#0B0B0B]/60 border border-white/5 space-y-2">
+              <div class="flex items-start gap-3">
+                <span class="px-2 py-0.5 rounded-lg bg-[#151515] border border-[#FF6A00]/30 font-heading font-bold text-xs text-[#FF6A00] flex-shrink-0 mt-0.5">5.3</span>
+                <p>Запрещены лаг машины или намеренное нанесение вреда серверу</p>
+              </div>
+              <div class="flex items-center gap-2 pl-9 text-xs text-rose-400 font-medium">
+                <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+                </svg>
+                <span><strong>Наказание:</strong> Бан.</span>
+              </div>
+            </div>
+
+            <!-- 5.4 -->
+            <div class="p-4 rounded-2xl bg-[#0B0B0B]/60 border border-white/5 space-y-2">
+              <div class="flex items-start gap-3">
+                <span class="px-2 py-0.5 rounded-lg bg-[#151515] border border-[#FF6A00]/30 font-heading font-bold text-xs text-[#FF6A00] flex-shrink-0 mt-0.5">5.4</span>
+                <p>Запрещено засорение мира (лавакасты, столбы и подобное).</p>
+              </div>
+              <div class="flex items-center gap-2 pl-9 text-xs text-rose-400 font-medium">
+                <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+                </svg>
+                <span><strong>Наказание:</strong> Штраф; При повторном нарушении по вердикту судьи</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. ЧИТЫ/МОДЫ -->
+        <div class="glass-panel glass-panel-hover p-6 sm:p-8 rounded-3xl relative overflow-hidden reveal">
+          <div class="flex items-center gap-4 mb-6">
+            <div class="w-12 h-12 rounded-2xl bg-[#151515] border border-[#FF6A00]/30 flex items-center justify-center text-[#FF6A00] flex-shrink-0">
+              <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+            </div>
+            <div>
+              <span class="text-xs font-heading font-semibold uppercase text-[#FF6A00] tracking-wider">Раздел 6</span>
+              <h3 class="font-heading font-bold text-lg sm:text-xl text-white">ЧИТЫ / МОДЫ</h3>
+            </div>
+          </div>
+
+          <div class="space-y-4 text-sm text-gray-200 leading-relaxed font-normal">
+            <!-- 6.1 -->
+            <div class="p-4 rounded-2xl bg-[#0B0B0B]/60 border border-white/5 space-y-3">
+              <div class="flex items-start gap-3">
+                <span class="px-2 py-0.5 rounded-lg bg-[#151515] border border-[#FF6A00]/30 font-heading font-bold text-xs text-[#FF6A00] flex-shrink-0 mt-0.5">6.1</span>
+                <div>
+                  <p class="font-semibold text-white">Запрещённые модификации:</p>
+                  <ul class="mt-2 space-y-1 text-gray-300 text-xs sm:text-sm pl-2">
+                    <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span>Freecam (позволяет летать через блоки)</li>
+                    <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span>X-ray (Позволяет видеть руды)</li>
+                    <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span>Litematika PRINTER</li>
+                    <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span>Макросы</li>
+                    <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span>Чит клиенты по типу Wurst, Delta, Nursultan, Wexside и подобные.</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 pl-9 text-xs text-rose-400 font-medium">
+                <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+                </svg>
+                <span><strong>Наказание:</strong> Бан</span>
+              </div>
+            </div>
+
+            <!-- 6.2 -->
+            <div class="p-4 rounded-2xl bg-[#0B0B0B]/60 border border-white/5 space-y-2">
+              <div class="flex items-start gap-3">
+                <span class="px-2 py-0.5 rounded-lg bg-[#151515] border border-[#FF6A00]/30 font-heading font-bold text-xs text-[#FF6A00] flex-shrink-0 mt-0.5">6.2</span>
+                <p>Запрещены дюпы.</p>
+              </div>
+              <div class="flex items-center gap-2 pl-9 text-xs text-rose-400 font-medium">
+                <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+                </svg>
+                <span><strong>Наказание:</strong> Бан</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ИСКЛЮЧЕНИЯ К ПРАВИЛАМ -->
+        <div class="glass-panel glass-panel-hover p-6 sm:p-8 rounded-3xl border-emerald-500/30 bg-emerald-950/15 relative overflow-hidden reveal">
+          <div class="flex items-center gap-4 mb-5">
+            <div class="w-12 h-12 rounded-2xl bg-emerald-900/30 border border-emerald-500/40 flex items-center justify-center text-emerald-400 flex-shrink-0">
+              <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                <polyline points="22 4 12 14.01 9 11.01"/>
+              </svg>
+            </div>
+            <div>
+              <span class="text-xs font-heading font-semibold uppercase text-emerald-400 tracking-wider">Разрешено регламентом</span>
+              <h3 class="font-heading font-bold text-lg sm:text-xl text-white">Исключения к правилам</h3>
+            </div>
+          </div>
+
+          <div class="space-y-4 text-sm text-gray-200 leading-relaxed font-normal">
+            <div class="p-4 rounded-2xl bg-[#0B0B0B]/70 border border-emerald-500/20">
+              <p class="font-heading font-semibold text-xs sm:text-sm text-emerald-300 mb-2">6.1 Список разрешённых модов:</p>
+              <ul class="space-y-1.5 text-xs sm:text-sm text-gray-300 pl-2">
+                <li class="flex items-center gap-2"><svg class="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Gammautils (позволяет увеличивать яркость игры)</li>
+                <li class="flex items-center gap-2"><svg class="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Replay/Flashback</li>
+                <li class="flex items-center gap-2"><svg class="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Автокликер</li>
+                <li class="flex items-center gap-2"><svg class="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Мини карта.</li>
+              </ul>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-[#0B0B0B]/70 border border-emerald-500/20">
+              <p class="text-xs sm:text-sm text-gray-200">
+                <strong class="text-emerald-300">2.3</strong> Правило не работает, если игрок совершает массовый гриф и подобное.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ИНФОРМАЦИЯ -->
+        <div class="glass-panel glass-panel-hover p-6 sm:p-8 rounded-3xl border-[#FF6A00]/30 bg-[#FF6A00]/5 relative overflow-hidden reveal">
+          <div class="flex items-center gap-4 mb-4">
+            <div class="w-12 h-12 rounded-2xl bg-[#FF6A00]/15 border border-[#FF6A00]/30 flex items-center justify-center text-[#FF6A00] flex-shrink-0">
+              <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="16" x2="12" y2="12"/>
+                <line x1="12" y1="8" x2="12.01" y2="8"/>
+              </svg>
+            </div>
+            <div>
+              <span class="text-xs font-heading font-semibold uppercase text-[#FF6A00] tracking-wider">Важное примечание</span>
+              <h3 class="font-heading font-bold text-lg sm:text-xl text-white">Информация</h3>
+            </div>
+          </div>
+
+          <div class="space-y-3 text-xs sm:text-sm text-gray-300 leading-relaxed font-normal pl-2 sm:pl-4 border-l-2 border-[#FF6A00]/40">
+            <p>• В списке выше предоставлены не все правила, если вы ведете себя неподобающе, то администрация вправе подумать, что вы ищете обходы данных правил и выдать наказание по своему усмотрению.</p>
+            <p>• Из-за фишки сервера - полная анонимность возможны заказные убийства, на них так же применяются правила из пункта 4</p>
+          </div>
+        </div>
+
+        <!-- Appeal Banner -->
+        <div class="glass-panel p-6 sm:p-8 rounded-3xl flex flex-col sm:flex-row items-center justify-between gap-6 border-[#FF6A00]/30 reveal mt-8">
+          <div class="flex items-center gap-4 text-left">
+            <div class="w-12 h-12 rounded-2xl bg-[#5865F2]/20 border border-[#5865F2]/40 flex items-center justify-center text-[#5865F2] flex-shrink-0">
+              <i data-lucide="help-circle" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <h4 class="font-heading font-bold text-base text-white">Вопросы или апелляция?</h4>
+              <p class="text-[#A0A0A0] text-xs sm:text-sm mt-0.5">Свяжитесь с составом проекта на официальном Discord сервере Wishur.</p>
+            </div>
+          </div>
+          <a href="https://discord.com/invite/4WKTuSXs6c" target="_blank" rel="noopener" class="w-full sm:w-auto px-6 py-3 rounded-xl bg-[#5865F2] hover:bg-[#4752C4] text-white font-heading text-xs font-semibold uppercase tracking-wider flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(88,101,242,0.35)] flex-shrink-0">
+            <i data-lucide="message-square" class="w-4 h-4"></i>Перейти в Discord
+          </a>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================== СТРАНИЦА: КОМАНДА ПРОЕКТА ==================== -->
+    <section id="page-team" class="page-view">
+      <div class="text-center mb-12">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-panel border-[#FF6A00]/30 text-[#FF6A00] text-xs font-semibold mb-3">
+          <i data-lucide="shield" class="w-3.5 h-3.5 text-[#FF6A00]"></i>Администрация Wishur
+        </div>
+        <h2 class="font-heading font-extrabold text-2xl sm:text-4xl text-white mb-3">КОМАНДА ПРОЕКТА</h2>
+        <p class="text-[#A0A0A0] text-sm sm:text-base max-w-xl mx-auto">Люди, которые создают, поддерживают и обеспечивают стабильность сервера Wishur</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+        <!-- Cathy -->
+        <div class="glass-panel glass-panel-hover p-6 rounded-3xl relative overflow-hidden group reveal flex flex-col justify-between border-[#FF6A00]/25">
+          <div>
+            <div class="relative w-20 h-20 rounded-2xl bg-[#151515] border border-[#FF6A00]/40 overflow-hidden mb-5 shadow-[0_0_25px_rgba(255,106,0,0.25)] group-hover:scale-105 transition-transform">
+              <img src="assets/admin/cathy.png" alt="Cathy" class="w-full h-full object-cover">
+              <span class="absolute bottom-1 right-1 w-4 h-4 rounded-full bg-emerald-400 border-2 border-[#151515]"></span>
+            </div>
+            <h3 class="font-heading font-extrabold text-xl text-white mb-1 group-hover:text-[#FF6A00] transition-colors">Cathy</h3>
+            <p class="text-xs text-[#A0A0A0] mb-4">Руководство &amp; Разработка</p>
+          </div>
+
+          <div class="space-y-1.5 pt-4 border-t border-white/5">
+            <span class="inline-block px-2.5 py-1 rounded-lg bg-[#FF6A00]/15 border border-[#FF6A00]/30 text-[11px] font-heading font-semibold text-[#FF6A00]">Владелец</span>
+            <span class="inline-block px-2.5 py-1 rounded-lg bg-[#151515] border border-white/10 text-[11px] font-heading font-semibold text-gray-300">Тех. Админ</span>
+            <span class="inline-block px-2.5 py-1 rounded-lg bg-[#151515] border border-white/10 text-[11px] font-heading font-semibold text-gray-300">Создатель</span>
+          </div>
+        </div>
+
+        <!-- Spailyk -->
+        <div class="glass-panel glass-panel-hover p-6 rounded-3xl relative overflow-hidden group reveal flex flex-col justify-between border-[#FF6A00]/25">
+          <div>
+            <div class="relative w-20 h-20 rounded-2xl bg-[#151515] border border-[#FF6A00]/40 overflow-hidden mb-5 shadow-[0_0_25px_rgba(255,106,0,0.25)] group-hover:scale-105 transition-transform">
+              <img src="assets/admin/spailyk.png" alt="Spailyk" class="w-full h-full object-cover">
+              <span class="absolute bottom-1 right-1 w-4 h-4 rounded-full bg-emerald-400 border-2 border-[#151515]"></span>
+            </div>
+            <h3 class="font-heading font-extrabold text-xl text-white mb-1 group-hover:text-[#FF6A00] transition-colors">Spailyk</h3>
+            <p class="text-xs text-[#A0A0A0] mb-4">Руководство &amp; Инфраструктура</p>
+          </div>
+
+          <div class="space-y-1.5 pt-4 border-t border-white/5">
+            <span class="inline-block px-2.5 py-1 rounded-lg bg-[#FF6A00]/15 border border-[#FF6A00]/30 text-[11px] font-heading font-semibold text-[#FF6A00]">Владелец</span>
+            <span class="inline-block px-2.5 py-1 rounded-lg bg-[#151515] border border-white/10 text-[11px] font-heading font-semibold text-gray-300">Тех. Админ</span>
+            <span class="inline-block px-2.5 py-1 rounded-lg bg-[#151515] border border-white/10 text-[11px] font-heading font-semibold text-gray-300">Тех. админ соц. сетей</span>
+          </div>
+        </div>
+
+        <!-- Sip Play -->
+        <div class="glass-panel glass-panel-hover p-6 rounded-3xl relative overflow-hidden group reveal flex flex-col justify-between border-[#FF6A00]/25">
+          <div>
+            <div class="relative w-20 h-20 rounded-2xl bg-[#151515] border border-[#FF6A00]/40 overflow-hidden mb-5 shadow-[0_0_25px_rgba(255,106,0,0.25)] group-hover:scale-105 transition-transform">
+              <img src="assets/admin/sip.png" alt="Sip Play" class="w-full h-full object-cover">
+              <span class="absolute bottom-1 right-1 w-4 h-4 rounded-full bg-emerald-400 border-2 border-[#151515]"></span>
+            </div>
+            <h3 class="font-heading font-extrabold text-xl text-white mb-1 group-hover:text-[#FF6A00] transition-colors">Sip Play</h3>
+            <p class="text-xs text-[#A0A0A0] mb-4">Управление &amp; Медиа</p>
+          </div>
+
+          <div class="space-y-1.5 pt-4 border-t border-white/5">
+            <span class="inline-block px-2.5 py-1 rounded-lg bg-[#FF6A00]/15 border border-[#FF6A00]/30 text-[11px] font-heading font-semibold text-[#FF6A00]">Администратор</span>
+            <span class="inline-block px-2.5 py-1 rounded-lg bg-[#151515] border border-white/10 text-[11px] font-heading font-semibold text-gray-300">Пиар менеджер</span>
+          </div>
+        </div>
+
+        <!-- Pepechad -->
+        <div class="glass-panel glass-panel-hover p-6 rounded-3xl relative overflow-hidden group reveal flex flex-col justify-between border-[#FF6A00]/25">
+          <div>
+            <div class="relative w-20 h-20 rounded-2xl bg-[#151515] border border-[#FF6A00]/40 overflow-hidden mb-5 shadow-[0_0_25px_rgba(255,106,0,0.25)] group-hover:scale-105 transition-transform">
+              <img src="assets/admin/pepe.png" alt="Pepechad" class="w-full h-full object-cover">
+              <span class="absolute bottom-1 right-1 w-4 h-4 rounded-full bg-emerald-400 border-2 border-[#151515]"></span>
+            </div>
+            <h3 class="font-heading font-extrabold text-xl text-white mb-1 group-hover:text-[#FF6A00] transition-colors">Pepechad</h3>
+            <p class="text-xs text-[#A0A0A0] mb-4">Визуальный стиль &amp; Арт</p>
+          </div>
+
+          <div class="space-y-1.5 pt-4 border-t border-white/5">
+            <span class="inline-block px-2.5 py-1 rounded-lg bg-[#FF6A00]/15 border border-[#FF6A00]/30 text-[11px] font-heading font-semibold text-[#FF6A00]">Дизайнер</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== СТРАНИЦА: FAQ ==================== -->
+    <section id="page-faq" class="page-view">
+      <div class="text-center mb-12">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-panel border-[#FF6A00]/30 text-[#FF6A00] text-xs font-semibold mb-3">
+          <i data-lucide="help-circle" class="w-3.5 h-3.5 text-[#FF6A00]"></i>База знаний
+        </div>
+        <h2 class="font-heading font-extrabold text-2xl sm:text-4xl text-white mb-3">ЧАСТЫЕ ВОПРОСЫ</h2>
+        <p class="text-[#A0A0A0] text-sm sm:text-base">Все, что нужно знать перед началом игры на сервере Wishur</p>
+      </div>
+
+      <div class="max-w-3xl mx-auto space-y-4">
+        <!-- Q1 -->
+        <div class="glass-panel rounded-2xl p-6 cursor-pointer reveal" onclick="toggleFaq(this)">
+          <div class="flex justify-between items-center">
+            <h3 class="font-heading font-semibold text-base sm:text-lg text-white">Какая версия майнкрафта поддерживается?</h3>
+            <i data-lucide="chevron-down" class="w-5 h-5 text-[#FF6A00] transition-transform duration-500"></i>
+          </div>
+          <div class="faq-content">
+            <p class="text-[#A0A0A0] text-sm mt-3 leading-relaxed font-normal">
+              Сервер работает на версии <strong class="text-[#FF6A00]">26.2-26.4</strong>. Используйте клиент соответствующей версии для стабильного подключения.
+            </p>
+          </div>
+        </div>
+
+        <!-- Q2 -->
+        <div class="glass-panel rounded-2xl p-6 cursor-pointer reveal" onclick="toggleFaq(this)">
+          <div class="flex justify-between items-center">
+            <h3 class="font-heading font-semibold text-base sm:text-lg text-white">Как получить доступ на сервер?</h3>
+            <i data-lucide="chevron-down" class="w-5 h-5 text-[#FF6A00] transition-transform duration-500"></i>
+          </div>
+          <div class="faq-content">
+            <p class="text-[#A0A0A0] text-sm mt-3 leading-relaxed font-normal">
+              Доступ предоставляется строго после подачи заявки в нашем <a href="https://discord.com/invite/4WKTuSXs6c" target="_blank" rel="noopener" class="text-[#FF6A00] underline font-medium">Discord сервере</a>. Администрация проверяет анкету кандидата, чтобы обеспечить адекватность и комфорт для всех игроков.
+            </p>
+          </div>
+        </div>
+
+        <!-- Q3 -->
+        <div class="glass-panel rounded-2xl p-6 cursor-pointer reveal" onclick="toggleFaq(this)">
+          <div class="flex justify-between items-center">
+            <h3 class="font-heading font-semibold text-base sm:text-lg text-white">Какой IP адрес у сервера?</h3>
+            <i data-lucide="chevron-down" class="w-5 h-5 text-[#FF6A00] transition-transform duration-500"></i>
+          </div>
+          <div class="faq-content">
+            <p class="text-[#A0A0A0] text-sm mt-3 leading-relaxed font-normal">
+              Официальный IP адрес сервера: <span class="text-[#FF6A00] font-bold select-all">mc.wishur.cc</span>. Вы можете скопировать его в один клик на главной странице.
+            </p>
+          </div>
+        </div>
+
+        <!-- Q4 -->
+        <div class="glass-panel rounded-2xl p-6 cursor-pointer reveal" onclick="toggleFaq(this)">
+          <div class="flex justify-between items-center">
+            <h3 class="font-heading font-semibold text-base sm:text-lg text-white">Есть ли донат, влияющий на баланс?</h3>
+            <i data-lucide="chevron-down" class="w-5 h-5 text-[#FF6A00] transition-transform duration-500"></i>
+          </div>
+          <div class="faq-content">
+            <p class="text-[#A0A0A0] text-sm mt-3 leading-relaxed font-normal">
+              Нет. На сервере действует строгое сохранение ванильной механики. Никаких плагинов на прокачку, дисбалансных предметов или привилегий с правами администратора нет. Игрокам доступны исключительно косметические опции (уникальные головные уборы).
+            </p>
+          </div>
+        </div>
+
+        <!-- Q5 -->
+        <div class="glass-panel rounded-2xl p-6 cursor-pointer reveal" onclick="toggleFaq(this)">
+          <div class="flex justify-between items-center">
+            <h3 class="font-heading font-semibold text-base sm:text-lg text-white">Где ознакомиться с полными правилами?</h3>
+            <i data-lucide="chevron-down" class="w-5 h-5 text-[#FF6A00] transition-transform duration-500"></i>
+          </div>
+          <div class="faq-content">
+            <p class="text-[#A0A0A0] text-sm mt-3 leading-relaxed font-normal">
+              Все правила структурированы в разделе <a href="#" onclick="switchPage('rules');return false;" class="text-[#FF6A00] underline font-semibold">«Правила»</a>. Соблюдение регламента обязательно для каждого участника сообщества.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== СТРАНИЦА: СОЦИАЛЬНЫЕ СЕТИ ==================== -->
+    <section id="page-socials" class="page-view">
+      <div class="text-center mb-12">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-panel border-[#FF6A00]/30 text-[#FF6A00] text-xs font-semibold mb-3">
+          <i data-lucide="share-2" class="w-3.5 h-3.5 text-[#FF6A00]"></i>Сообщество проекта
+        </div>
+        <h2 class="font-heading font-extrabold text-2xl sm:text-4xl text-white mb-3">СОЦИАЛЬНЫЕ СЕТИ</h2>
+        <p class="text-[#A0A0A0] text-sm sm:text-base">Присоединяйтесь к Wishur на официальных платформах</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+        <!-- Discord -->
+        <a href="https://discord.com/invite/4WKTuSXs6c" target="_blank" rel="noopener" class="glass-panel glass-panel-hover p-6 rounded-3xl flex flex-col items-start gap-5 group reveal border-[#5865F2]/30">
+          <div class="w-14 h-14 rounded-2xl bg-[#5865F2]/20 border border-[#5865F2]/40 flex items-center justify-center text-[#5865F2] group-hover:scale-110 transition-transform shadow-[0_0_20px_rgba(88,101,242,0.25)]">
+            <svg class="w-7 h-7 fill-current" viewBox="0 0 24 24">
+              <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-heading font-bold text-lg text-white">Discord</h3>
+            <p class="text-[#A0A0A0] text-xs sm:text-sm mt-1 font-normal">Подача заявок, общение, тикеты и тех. поддержка проекта</p>
+          </div>
+          <span class="mt-auto text-xs font-heading font-semibold text-[#5865F2] flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+            Присоединиться <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+          </span>
+        </a>
+
+        <!-- Telegram -->
+        <a href="https://t.me/wishur_ru" target="_blank" rel="noopener" class="glass-panel glass-panel-hover p-6 rounded-3xl flex flex-col items-start gap-5 group reveal border-[#229ED9]/30">
+          <div class="w-14 h-14 rounded-2xl bg-[#229ED9]/20 border border-[#229ED9]/40 flex items-center justify-center text-[#229ED9] group-hover:scale-110 transition-transform shadow-[0_0_20px_rgba(34,158,217,0.25)]">
+            <svg class="w-7 h-7 fill-current" viewBox="0 0 24 24">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 0 0-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.37.75-.56 2.95-1.28 4.92-2.13 5.91-2.54 2.81-1.17 3.39-1.37 3.77-1.38.08 0 .27.02.39.12.1.08.13.2.14.28-.01.07-.01.21-.03.32z"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-heading font-bold text-lg text-white">Telegram</h3>
+            <p class="text-[#A0A0A0] text-xs sm:text-sm mt-1 font-normal">Свежие новости, оперативные анонсы и важные посты</p>
+          </div>
+          <span class="mt-auto text-xs font-heading font-semibold text-[#229ED9] flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+            t.me/wishur_ru <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+          </span>
+        </a>
+
+        <!-- YouTube -->
+        <a href="https://youtube.com/@wishur_mc" target="_blank" rel="noopener" class="glass-panel glass-panel-hover p-6 rounded-3xl flex flex-col items-start gap-5 group reveal border-[#FF0000]/30">
+          <div class="w-14 h-14 rounded-2xl bg-[#FF0000]/20 border border-[#FF0000]/40 flex items-center justify-center text-[#FF0000] group-hover:scale-110 transition-transform shadow-[0_0_20px_rgba(255,0,0,0.25)]">
+            <svg class="w-7 h-7 fill-current" viewBox="0 0 24 24">
+              <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-heading font-bold text-lg text-white">YouTube</h3>
+            <p class="text-[#A0A0A0] text-xs sm:text-sm mt-1 font-normal">Официальные ролики, обзоры обновлений и ивентов</p>
+          </div>
+          <span class="mt-auto text-xs font-heading font-semibold text-[#FF0000] flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+            @wishur_mc <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+          </span>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="relative z-10 border-t border-[#FF6A00]/15 bg-[#0B0B0B]/90 backdrop-blur-md py-8 px-4 text-center">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#A0A0A0]">
+      <!-- Brand & Version -->
+      <div class="flex items-center gap-2.5">
+        <div class="w-6 h-6 rounded-lg bg-[#151515] border border-[#FF6A00]/40 flex items-center justify-center overflow-hidden p-0.5">
+          <img src="assets/logo.png" alt="Wishur" class="w-full h-full object-contain">
+        </div>
+        <span class="font-heading font-semibold text-white">Wishur</span>
+        <span class="text-[11px] px-2 py-0.5 rounded bg-[#151515] border border-white/5 text-[#A0A0A0]">26.2-26.4</span>
+      </div>
+
+      <!-- Copyright -->
+      <p class="font-normal">©Wishur 2026. Все права защищены.</p>
+
+      <!-- Footer Nav -->
+      <div class="flex flex-wrap items-center justify-center gap-4">
+        <button onclick="switchPage('rules')" class="hover:text-[#FF6A00] transition-colors">Правила</button>
+        <button onclick="switchPage('team')" class="hover:text-[#FF6A00] transition-colors">Команда</button>
+        <button onclick="switchPage('socials')" class="hover:text-[#FF6A00] transition-colors">Контакты</button>
+        <a href="https://discord.com/invite/4WKTuSXs6c" target="_blank" rel="noopener" class="hover:text-[#FF6A00] transition-colors">Discord</a>
+        <a href="https://t.me/wishur_ru" target="_blank" rel="noopener" class="hover:text-[#FF6A00] transition-colors">Telegram</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast fixed bottom-6 right-6 z-50 glass-panel border-[#FF6A00]/50 bg-[#151515]/95 px-5 py-3.5 rounded-2xl flex items-center gap-3 text-white shadow-[0_0_25px_rgba(255,106,0,0.35)]">
+    <svg class="w-5 h-5 text-[#FF6A00]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+      <polyline points="22 4 12 14.01 9 11.01"/>
+    </svg>
+    <span class="text-sm font-medium">IP адрес <strong class="text-[#FF6A00]">mc.wishur.cc</strong> скопирован!</span>
+  </div>
+
+  <script>
+    lucide.createIcons();
+
+    // Nav pill animation
+    function updatePillPosition(btn) {
+      const pill = document.getElementById('navPill');
+      if (!btn || !pill) return;
+      pill.style.width = `${btn.offsetWidth}px`;
+      pill.style.left = `${btn.offsetLeft}px`;
+    }
+
+    // Single-page navigation
+    function switchPage(pageId) {
+      document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
+      const target = document.getElementById(`page-${pageId}`);
+      if (target) target.classList.add('active');
+
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        if (btn.dataset.nav === pageId) {
+          btn.classList.add('text-white');
+          btn.classList.remove('text-[#A0A0A0]');
+          updatePillPosition(btn);
+        } else {
+          btn.classList.remove('text-white');
+          btn.classList.add('text-[#A0A0A0]');
+        }
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setTimeout(checkReveal, 120);
+      lucide.createIcons();
+    }
+
+    window.addEventListener('load', () => updatePillPosition(document.querySelector('.nav-btn.text-white')));
+    window.addEventListener('resize', () => updatePillPosition(document.querySelector('.nav-btn.text-white')));
+
+    // Mobile menu toggle
+    function toggleMobileMenu() {
+      document.getElementById('mobileMenu').classList.toggle('hidden');
+    }
+    document.getElementById('mobileMenuBtn').addEventListener('click', toggleMobileMenu);
+
+    // IP Copy with icon swap animation
+    function copyIP(btn) {
+      const ip = "mc.wishur.cc";
+      const showToast = () => {
+        const t = document.getElementById("toast");
+        t.classList.add("show");
+        setTimeout(() => t.classList.remove("show"), 3200);
+      };
+      const animate = () => {
+        if (!btn) return;
+        const iconWrap = btn.querySelector('.copy-btn-icon');
+        if (iconWrap) {
+          iconWrap.classList.add('copied');
+          setTimeout(() => iconWrap.classList.remove('copied'), 2000);
+        }
+      };
+      const doCopy = () => {
+        showToast();
+        animate();
+      };
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(ip).then(doCopy).catch(doCopy);
+      } else {
+        const el = document.createElement("textarea");
+        el.value = ip;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand("copy");
+        document.body.removeChild(el);
+        doCopy();
+      }
+    }
+
+    // FAQ Accordion
+    function toggleFaq(el) {
+      const content = el.querySelector('.faq-content');
+      const icon = el.querySelector('[data-lucide="chevron-down"]');
+      const open = content.classList.contains('open');
+      content.classList.toggle('open');
+      if (icon) icon.style.transform = open ? 'rotate(0deg)' : 'rotate(180deg)';
+    }
+
+    // Scroll reveal observer
+    const observer = new IntersectionObserver(entries => {
+      entries.filter(e => e.isIntersecting)
+        .sort((a, b) => {
+          const ra = a.target.getBoundingClientRect(), rb = b.target.getBoundingClientRect();
+          return ra.top - rb.top || ra.left - rb.left;
+        })
+        .forEach((e, i) => {
+          setTimeout(() => {
+            e.target.classList.add('visible');
+            observer.unobserve(e.target);
+          }, i * 75);
+        });
+    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+    function checkReveal() {
+      document.querySelectorAll('.reveal:not(.visible)').forEach(el => observer.observe(el));
+    }
+    checkReveal();
+
+    // Theme toggle
+    function toggleTheme() {
+      document.documentElement.classList.add('theme-anim');
+      document.documentElement.classList.toggle('light');
+      localStorage.setItem('theme', document.documentElement.classList.contains('light') ? 'light' : 'dark');
+      setTimeout(() => document.documentElement.classList.remove('theme-anim'), 400);
+    }
+
+    // Particle canvas background (x3.5 speed & intensity)
+    const canvas = document.getElementById('particles');
+    const ctx = canvas.getContext('2d');
+    let particles = [], particlesOn = localStorage.getItem('particles') !== 'off', rafId;
+
+    const SPEED_MULT = 3.5;
+    const COUNT = Math.round(55 * 3.5);
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    function initParticles() {
+      particles = Array.from({ length: COUNT }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: (Math.random() - 0.5) * 0.25 * SPEED_MULT,
+        vy: (Math.random() - 0.5) * 0.25 * SPEED_MULT,
+        r: (Math.random() * 2.2 + 0.6) * 1.15,
+        a: Math.min(1, (Math.random() * 0.45 + 0.15) * 1.6)
+      }));
+    }
+
+    function loop() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const isLight = document.documentElement.classList.contains('light');
+      const c = isLight ? '201,71,0' : '255,106,0';
+      particles.forEach(p => {
+        p.x += p.vx; p.y += p.vy;
+        if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+        if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${c},${p.a})`;
+        ctx.fill();
+      });
+      rafId = requestAnimationFrame(loop);
+    }
+
+    function updateParticleUI() {
+      const btn = document.getElementById('particleToggle');
+      if (btn) btn.classList.toggle('opacity-40', !particlesOn);
+      canvas.style.opacity = particlesOn ? '1' : '0';
+    }
+
+    function toggleParticles() {
+      particlesOn = !particlesOn;
+      localStorage.setItem('particles', particlesOn ? 'on' : 'off');
+      updateParticleUI();
+      if (particlesOn) {
+        if (!rafId) rafId = requestAnimationFrame(loop);
+      } else {
+        if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+    }
+
+    resize();
+    initParticles();
+    updateParticleUI();
+    window.addEventListener('resize', () => { resize(); initParticles(); });
+    if (particlesOn) rafId = requestAnimationFrame(loop);
+
+    // Interactive cursor glow
+    const glow = document.getElementById('cursorGlow');
+    let mouseX = 0, mouseY = 0, glowX = 0, glowY = 0;
+    document.addEventListener('mousemove', e => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      glow.style.opacity = '1';
+    });
+    document.addEventListener('mouseleave', () => glow.style.opacity = '0');
+    function animateGlow() {
+      glowX += (mouseX - glowX) * 0.1;
+      glowY += (mouseY - glowY) * 0.1;
+      glow.style.left = glowX + 'px';
+      glow.style.top = glowY + 'px';
+      requestAnimationFrame(animateGlow);
+    }
+    animateGlow();
+
+    // =========================================================
+    // API: Онлайн сервера
+    // =========================================================
+    async function fetchServerStatus() {
+      const heroText = document.getElementById('heroStatusText');
+      const liveDetail = document.getElementById('liveStatusDetail');
+      const livePlayer = document.getElementById('livePlayerDetail');
+
+      const setOnline = (onlinePlayers, maxPlayers) => {
+        if (heroText) {
+          heroText.textContent = `• Онлайн (${onlinePlayers})`;
+          heroText.className = 'text-[10px] text-emerald-400 font-heading font-bold';
+        }
+        if (liveDetail) {
+          liveDetail.textContent = 'Сервер запущен и доступен';
+          liveDetail.className = 'text-sm font-heading font-semibold text-emerald-400';
+        }
+        if (livePlayer) {
+          livePlayer.textContent = `${onlinePlayers} / ${maxPlayers}`;
+        }
+      };
+
+      const setOffline = () => {
+        if (heroText) {
+          heroText.textContent = '• Офлайн';
+          heroText.className = 'text-[10px] text-zinc-400 font-heading font-bold';
+        }
+        if (liveDetail) {
+          liveDetail.textContent = 'Недоступен';
+          liveDetail.className = 'text-sm font-heading font-semibold text-zinc-400';
+        }
+        if (livePlayer) {
+          livePlayer.textContent = '0';
+        }
+      };
+
+      try {
+        const response = await fetch('https://api.mcsrvstat.us/3/mc.wishur.cc');
+        if (!response.ok) throw new Error('mcsrvstat status error');
+        const data = await response.json();
+
+        if (data && data.online) {
+          const online = data.players ? data.players.online : 0;
+          const max = data.players ? data.players.max : 100;
+          setOnline(online, max);
+        } else {
+          try {
+            const fallbackRes = await fetch('https://mcapi.us/server/status?ip=mc.wishur.cc');
+            const fallbackData = await fallbackRes.json();
+            if (fallbackData && fallbackData.online) {
+              setOnline(fallbackData.players.now, fallbackData.players.max);
+            } else {
+              setOffline();
+            }
+          } catch {
+            setOffline();
+          }
+        }
+      } catch (err) {
+        try {
+          const fallbackRes = await fetch('https://mcapi.us/server/status?ip=mc.wishur.cc');
+          const fallbackData = await fallbackRes.json();
+          if (fallbackData && fallbackData.online) {
+            setOnline(fallbackData.players.now, fallbackData.players.max);
+          } else {
+            setOffline();
+          }
+        } catch {
+          setOffline();
+        }
+      }
+    }
+
+    // Manual refresh button with spin animation
+    function refreshServerStatus(btn) {
+      const icon = document.getElementById('refreshStatusIcon');
+      if (btn) btn.classList.add('pointer-events-none', 'opacity-70');
+      if (icon) {
+        icon.style.transition = 'transform 0.9s cubic-bezier(0.16,1,0.3,1)';
+        icon.style.transform = 'rotate(360deg)';
+        setTimeout(() => { icon.style.transition = 'none'; icon.style.transform = 'rotate(0deg)'; }, 950);
+      }
+      fetchServerStatus().finally(() => {
+        setTimeout(() => {
+          if (btn) btn.classList.remove('pointer-events-none', 'opacity-70');
+        }, 900);
+      });
+    }
+
+    // Первичный опрос и таймер обновления каждые 60 секунд
+    fetchServerStatus();
+    setInterval(fetchServerStatus, 60000);
+  </script>
+</body>
+</html>
