@@ -66,11 +66,16 @@
       color: #FFFFFF;
       font-family: 'Montserrat', sans-serif;
       overflow-x: hidden;
+      overflow-y: scroll;
       margin: 0;
       min-height: 100vh;
       min-height: 100dvh;
       display: flex;
       flex-direction: column;
+    }
+
+    html {
+      scroll-behavior: smooth;
     }
 
     ::-webkit-scrollbar {
@@ -218,7 +223,10 @@
       background: radial-gradient(circle, rgba(255, 106, 0, 0.15) 0%, rgba(255, 106, 0, 0) 70%);
     }
 
-    #particles { transition: opacity 0.5s cubic-bezier(0.16,1,0.3,1); }
+    #particles { 
+      transition: opacity 0.5s cubic-bezier(0.16,1,0.3,1);
+      will-change: transform;
+    }
     #cursorGlow {
       position: fixed; width: 320px; height: 320px; border-radius: 50%;
       background: radial-gradient(circle, rgba(255,106,0,0.18) 0%, rgba(255,106,0,0) 70%);
@@ -281,6 +289,24 @@
       vertical-align: middle;
       flex-shrink: 0;
     }
+
+    /* Мобильное меню (плавное открытие) */
+    #mobileMenu {
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-height 0.45s cubic-bezier(0.16, 1, 0.3, 1), 
+                  opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+                  padding 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+                  margin 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    #mobileMenu.open {
+      max-height: 500px;
+      opacity: 1;
+      padding-top: 1rem;
+      padding-bottom: 1.5rem;
+      margin-top: 0.75rem;
+    }
   </style>
 </head>
 <body class="bg-[#0B0B0B] text-white min-h-screen flex flex-col bg-grid relative selection:bg-[#FF6A00] selection:text-white">
@@ -337,7 +363,7 @@
     </div>
 
     <!-- Mobile Drawer Menu -->
-    <div id="mobileMenu" class="hidden md:hidden px-4 pt-4 pb-6 border-t border-[#FF6A00]/15 bg-[#0B0B0B]/95 backdrop-blur-2xl mt-3">
+    <div id="mobileMenu" class="md:hidden border-t border-[#FF6A00]/15 bg-[#0B0B0B]/95 backdrop-blur-2xl px-4">
       <nav class="flex flex-col gap-2">
         <button onclick="switchPage('home');toggleMobileMenu()" class="text-left px-4 py-3 rounded-xl text-sm font-semibold font-heading uppercase text-gray-200 hover:bg-[#FF6A00]/15">Главная</button>
         <button onclick="switchPage('features');toggleMobileMenu()" class="text-left px-4 py-3 rounded-xl text-sm font-semibold font-heading uppercase text-gray-200 hover:bg-[#FF6A00]/15">Преимущества</button>
@@ -1263,7 +1289,12 @@
         }
       });
 
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (window.innerWidth < 768) {
+        window.scrollTo(0, 0);
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+      
       setTimeout(checkReveal, 120);
       lucide.createIcons();
     }
@@ -1273,7 +1304,7 @@
 
     // Mobile menu toggle
     function toggleMobileMenu() {
-      document.getElementById('mobileMenu').classList.toggle('hidden');
+      document.getElementById('mobileMenu').classList.toggle('open');
     }
     document.getElementById('mobileMenuBtn').addEventListener('click', toggleMobileMenu);
 
@@ -1347,17 +1378,20 @@
       setTimeout(() => document.documentElement.classList.remove('theme-anim'), 400);
     }
 
-    // Particle canvas background (x3.5 speed & intensity)
+    // Particle canvas background (Adaptive)
     const canvas = document.getElementById('particles');
     const ctx = canvas.getContext('2d');
     let particles = [], particlesOn = localStorage.getItem('particles') !== 'off', rafId;
-
-    const SPEED_MULT = 3.5;
-    const COUNT = Math.round(55 * 3.5);
+    
+    const isMobile = window.innerWidth < 768;
+    const SPEED_MULT = isMobile ? 2 : 3.5; 
+    const COUNT = isMobile ? 60 : Math.round(55 * 3.5);
 
     function resize() {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
+      canvas.style.width = '100%';
+      canvas.style.height = '100%';
     }
 
     function initParticles() {
@@ -1366,8 +1400,8 @@
         y: Math.random() * canvas.height,
         vx: (Math.random() - 0.5) * 0.25 * SPEED_MULT,
         vy: (Math.random() - 0.5) * 0.25 * SPEED_MULT,
-        r: (Math.random() * 2.2 + 0.6) * 1.15,
-        a: Math.min(1, (Math.random() * 0.45 + 0.15) * 1.6)
+        r: (Math.random() * 2.2 + 0.6) * (isMobile ? 1 : 1.15),
+        a: Math.min(1, (Math.random() * 0.45 + 0.15) * (isMobile ? 1.2 : 1.6))
       }));
     }
 
@@ -1386,6 +1420,12 @@
       });
       rafId = requestAnimationFrame(loop);
     }
+
+    window.addEventListener('scroll', () => {
+      if (isMobile && particlesOn && !rafId) {
+        rafId = requestAnimationFrame(loop);
+      }
+    }, { passive: true });
 
     function updateParticleUI() {
       const btn = document.getElementById('particleToggle');
@@ -1408,7 +1448,12 @@
     resize();
     initParticles();
     updateParticleUI();
-    window.addEventListener('resize', () => { resize(); initParticles(); });
+    
+    window.addEventListener('resize', () => { 
+      resize(); 
+      initParticles(); 
+    });
+    
     if (particlesOn) rafId = requestAnimationFrame(loop);
 
     // Interactive cursor glow
@@ -1429,9 +1474,7 @@
     }
     animateGlow();
 
-    // =========================================================
     // API: Онлайн сервера
-    // =========================================================
     async function fetchServerStatus() {
       const heroText = document.getElementById('heroStatusText');
       const liveDetail = document.getElementById('liveStatusDetail');
@@ -1457,7 +1500,7 @@
           heroText.className = 'text-[10px] text-zinc-400 font-heading font-bold';
         }
         if (liveDetail) {
-          liveDetail.textContent = 'Недоступен';
+          liveDetail.textContent = 'Сервер временно недоступен';
           liveDetail.className = 'text-sm font-heading font-semibold text-zinc-400';
         }
         if (livePlayer) {
