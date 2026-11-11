@@ -307,6 +307,22 @@
       padding-bottom: 1.5rem;
       margin-top: 0.75rem;
     }
+	
+	/* Стеклянный навбар */
+    .glass-nav {
+      background: rgba(21, 21, 21, 0.4); /* Более прозрачный фон */
+      backdrop-filter: blur(24px) saturate(150%);
+      -webkit-backdrop-filter: blur(24px) saturate(150%);
+      border: 1px solid rgba(255, 106, 0, 0.2);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.05); /* Легкий блик по краям */
+    }
+    
+    /* Адаптация под светлую тему */
+    .light .glass-nav {
+      background: rgba(255, 255, 255, 0.4);
+      border-color: rgba(255, 106, 0, 0.25);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05), inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+    }
   </style>
 </head>
 <body class="bg-[#0B0B0B] text-white min-h-screen flex flex-col bg-grid relative selection:bg-[#FF6A00] selection:text-white">
@@ -321,7 +337,7 @@
   <canvas id="particles" class="fixed inset-0 pointer-events-none z-0"></canvas>
 
   <!-- Header -->
-  <header class="sticky top-0 z-50 backdrop-blur-2xl bg-[#0B0B0B]/85 border-b border-[#FF6A00]/20 px-3 lg:px-6 py-3.5 transition-colors">
+  <header class="sticky top-0 z-50 backdrop-blur-3xl bg-[#0B0B0B]/60 border-b border-[#FF6A00]/20 px-3 lg:px-6 py-3.5 transition-colors">
     <div class="max-w-7xl mx-auto flex items-center justify-between gap-3 flex-nowrap">
 
       <!-- Logo -->
@@ -335,7 +351,7 @@
       </a>
 
       <!-- Desktop Navigation (one row, no expansion) -->
-      <nav class="hidden md:flex items-center gap-1 bg-[#151515]/80 p-1 rounded-2xl border border-[#FF6A00]/25 relative flex-nowrap min-w-0 overflow-x-auto" id="desktopNav">
+      <nav class="hidden md:flex items-center gap-1 glass-nav p-1 rounded-2xl relative flex-nowrap min-w-0 overflow-x-auto" id="desktopNav">
         <div id="navPill" class="nav-pill pointer-events-none"></div>
         <button onclick="switchPage('home')" data-nav="home" class="nav-btn relative z-10 px-3 py-2 rounded-xl text-[11px] font-semibold uppercase font-heading text-white transition-colors whitespace-nowrap">Главная</button>
         <button onclick="switchPage('features')" data-nav="features" class="nav-btn relative z-10 px-3 py-2 rounded-xl text-[11px] font-semibold uppercase font-heading text-[#A0A0A0] hover:text-white transition-colors whitespace-nowrap">Преимущества</button>
@@ -343,8 +359,13 @@
         <button onclick="switchPage('team')" data-nav="team" class="nav-btn relative z-10 px-3 py-2 rounded-xl text-[11px] font-semibold uppercase font-heading text-[#A0A0A0] hover:text-white transition-colors whitespace-nowrap">Команда</button>
         <button onclick="switchPage('faq')" data-nav="faq" class="nav-btn relative z-10 px-3 py-2 rounded-xl text-[11px] font-semibold uppercase font-heading text-[#A0A0A0] hover:text-white transition-colors whitespace-nowrap">FAQ</button>
         <button onclick="switchPage('socials')" data-nav="socials" class="nav-btn relative z-10 px-3 py-2 rounded-xl text-[11px] font-semibold uppercase font-heading text-[#A0A0A0] hover:text-white transition-colors whitespace-nowrap">Соц. сети</button>
+		<a href="wiki/wiki.html" class="hidden sm:flex h-9 px-3 items-center justify-center gap-1.5 rounded-xl bg-[#151515] border border-[#FF6A00]/25 text-[#FF6A00] hover:text-white hover:border-[#FF6A00] hover:bg-[#C94700]/30 font-heading text-[10px] font-bold uppercase tracking-wider">
+          <i data-lucide="book-open" class="w-4 h-4"></i>
+        <span class="hidden lg:inline">Вики</span> 
+        </a>
       </nav>
-
+      
+	  
       <!-- Right Actions -->
       <div class="flex items-center gap-1.5 shrink-0">
         <button id="themeToggle" onclick="toggleTheme()" aria-label="Сменить тему" class="w-9 h-9 flex items-center justify-center rounded-xl bg-[#151515] border border-[#FF6A00]/25 text-[#FF6A00] hover:text-white hover:border-[#FF6A00] hover:bg-[#C94700]/30">
@@ -371,6 +392,9 @@
         <button onclick="switchPage('team');toggleMobileMenu()" class="text-left px-4 py-3 rounded-xl text-sm font-semibold font-heading uppercase text-gray-200 hover:bg-[#FF6A00]/15">Команда проекта</button>
         <button onclick="switchPage('faq');toggleMobileMenu()" class="text-left px-4 py-3 rounded-xl text-sm font-semibold font-heading uppercase text-gray-200 hover:bg-[#FF6A00]/15">FAQ</button>
         <button onclick="switchPage('socials');toggleMobileMenu()" class="text-left px-4 py-3 rounded-xl text-sm font-semibold font-heading uppercase text-gray-200 hover:bg-[#FF6A00]/15">Соц. сети</button>
+		<a href="wiki/wiki.html" class="text-left px-4 py-3 rounded-xl text-sm font-semibold font-heading uppercase text-gray-200 hover:bg-[#FF6A00]/15 flex items-center gap-2">
+          <i data-lucide="book-open" class="w-4 h-4 text-[#FF6A00]"></i> Вики
+        </a>
       </nav>
     </div>
   </header>
@@ -1248,6 +1272,7 @@
         <button onclick="switchPage('socials')" class="hover:text-[#FF6A00] transition-colors">Контакты</button>
         <a href="https://discord.com/invite/4WKTuSXs6c" target="_blank" rel="noopener" class="hover:text-[#FF6A00] transition-colors">Discord</a>
         <a href="https://t.me/wishur_ru" target="_blank" rel="noopener" class="hover:text-[#FF6A00] transition-colors">Telegram</a>
+		<a href="wiki/wiki.html" class="hover:text-[#FF6A00] transition-colors">Вики</a>
       </div>
     </div>
   </footer>
