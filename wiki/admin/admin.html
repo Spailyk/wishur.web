@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Админ-панель — Wishur Wiki</title>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Unbounded:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
+  <script>
+    if (localStorage.getItem('theme') === 'light') document.documentElement.classList.add('light');
+  </script>
+</head>
+<body>
+
+  <!-- ==== LOGIN SCREEN ==== -->
+  <div id="loginScreen" class="login-screen">
+    <div class="login-bg">
+      <div class="orb login-orb-1"></div>
+      <div class="orb login-orb-2"></div>
+    </div>
+    <div class="login-card">
+      <div class="login-logo"><img src="../../assets/logo.png" alt="Wishur"></div>
+      <h1 class="login-title font-heading">WISHUR <span>ADMIN</span></h1>
+      <p class="login-sub">Авторизация в панели управления Wiki</p>
+
+      <form id="loginForm" class="login-form" autocomplete="off">
+        <div class="login-field">
+          <label for="loginUser">Логин</label>
+          <input id="loginUser" type="text" required autocomplete="username" placeholder="Введите логин">
+        </div>
+        <div class="login-field">
+          <label for="loginPass">Пароль</label>
+          <div class="login-pass-wrap">
+            <input id="loginPass" type="password" required autocomplete="current-password" placeholder="Введите пароль">
+            <button type="button" id="togglePass" class="login-eye" aria-label="Показать пароль">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+        <div id="loginError" class="login-error"></div>
+        <button type="submit" id="loginBtn" class="login-submit">
+          <span class="login-submit-text">Войти</span>
+          <span class="login-spinner"></span>
+        </button>
+      </form>
+
+      <p class="login-note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Защищено SHA-256. Сессия истекает через 30 минут.
+      </p>
+    </div>
+  </div>
+
+  <!-- ==== ADMIN APP ==== -->
+  <div id="adminApp" class="admin-app" style="display:none">
+    <header class="admin-header">
+      <div class="admin-header-inner">
+        <a href="../wiki.html" class="admin-brand">
+          <div class="admin-brand-logo"><img src="../../assets/logo.png" alt="Wishur"></div>
+          <span class="font-heading">WISHUR</span>
+          <span class="admin-tag font-heading">Admin</span>
+        </a>
+        <div class="admin-header-actions">
+          <span class="admin-user">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span id="currentUser">—</span>
+          </span>
+          <a href="../wiki.html" class="header-btn" title="К вики">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            <span class="btn-label">К вики</span>
+          </a>
+          <button id="themeToggle" class="header-btn icon-only" aria-label="Сменить тему" title="Сменить тему">
+            <svg class="icon icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            <svg class="icon icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          </button>
+          <button id="logoutBtn" class="header-btn icon-only" title="Выйти">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="admin-main">
+      <div class="admin-title-row">
+        <div>
+          <h1 class="font-heading">Управление Wiki</h1>
+          <p class="admin-subtitle">Директории и статьи. Контент в Markdown.</p>
+        </div>
+      </div>
+
+      <div class="admin-grid">
+        <div class="admin-col">
+          <section class="glass-panel admin-card">
+            <div class="admin-card-head">
+              <h2 class="font-heading">Директории</h2>
+              <button id="addDirBtn" class="btn-primary small">+ Добавить</button>
+            </div>
+            <div id="dirList"></div>
+          </section>
+
+          <section class="glass-panel admin-card">
+            <div class="admin-card-head">
+              <h2 class="font-heading">Статьи</h2>
+              <button id="addArtBtn" class="btn-primary small">+ Добавить</button>
+            </div>
+            <div id="artList" class="admin-scroll"></div>
+          </section>
+
+          <button id="resetBtn" class="btn-ghost w-full danger-text">Сбросить к начальным данным</button>
+        </div>
+
+        <div class="admin-col">
+          <section class="glass-panel admin-card editor-card">
+            <div id="editorEmpty" class="editor-empty">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+              <p>Выберите статью или создайте новую</p>
+            </div>
+
+            <form id="editorForm" class="admin-form hidden">
+              <div class="editor-head">
+                <h2 class="font-heading" id="editorTitle">Редактирование</h2>
+                <button type="button" id="cancelEdit" class="btn-ghost small">Отмена</button>
+              </div>
+              <input type="hidden" id="artId">
+              <div class="form-group">
+                <label>Название статьи</label>
+                <input id="artTitle" type="text" required placeholder="Например: Как построить ферму">
+              </div>
+              <div class="form-group">
+                <label>Директория</label>
+                <select id="artDir"></select>
+              </div>
+              <div class="form-group">
+                <label>Содержимое (Markdown)</label>
+                <textarea id="artContent" placeholder="# Заголовок&#10;&#10;Текст **жирным**, *курсивом*..."></textarea>
+                <div class="md-help">
+                  <code># H1</code><code>## H2</code><code>**bold**</code><code>*italic*</code><code>[link](url)</code><code>`code`</code><code>- list</code><code>&gt; quote</code>
+                </div>
+              </div>
+              <div class="editor-actions">
+                <button type="submit" class="btn-primary flex-1">Сохранить</button>
+                <button type="button" id="deleteArtBtn" class="btn-ghost danger-text hidden">Удалить</button>
+              </div>
+            </form>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- MODALS -->
+  <div id="modalDir" class="modal-backdrop">
+    <div class="modal">
+      <h3 class="font-heading" id="modalDirTitle">Новая директория</h3>
+      <div class="admin-form">
+        <div class="form-group">
+          <label>Название</label>
+          <input id="dirNameInput" type="text" placeholder="Например: Начало игры">
+        </div>
+        <div class="form-group">
+          <label>Родительская директория</label>
+          <select id="dirParentInput"></select>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button id="dirSaveBtn" class="btn-primary flex-1">Сохранить</button>
+        <button id="dirCancelBtn" class="btn-ghost flex-1">Отмена</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="confirmModal" class="modal-backdrop">
+    <div class="modal">
+      <h3 class="font-heading">Подтверждение</h3>
+      <p id="confirmText" class="confirm-text">Вы уверены?</p>
+      <div class="modal-actions">
+        <button id="confirmYes" class="btn-primary flex-1 danger-bg">Удалить</button>
+        <button id="confirmNo" class="btn-ghost flex-1">Отмена</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"><span id="toastText"></span></div>
+
+  <script src="../data/seed.js"></script>
+  <script src="../js/store.js"></script>
+  <script src="auth.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>
